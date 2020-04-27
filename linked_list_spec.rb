@@ -1,7 +1,7 @@
 require "rspec"
 require "./linked_list"
 
-describe LinkedList::Collection do
+describe LinkedList do
   it "appends and prepends items" do
     subject.append("A")
     expect(subject.tail.value). to eq "A"
