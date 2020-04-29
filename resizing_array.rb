@@ -1,3 +1,40 @@
+# The idea with this class is to show in Ruby how you might implement a 
+# dynamically resizing array, without leveraging the `Array` class from
+# the standard library.
+#
+# We use the methods `instance_variable_get`, `instance_variable_set`
+# and `remove_instance_variable` to simulate allocating, deallocating,
+# and reading/writing to addresses in memory, as you would do in a 
+# language like C if you wanted to implement this data structure.
+#
+# The array is initialized with some amount of `capacity` used to
+# store its values, and that capacity is expanded as needed when
+# values are added to the array. Capacity is reduced if there is
+# a lot of unused space after an item is removed from the array.
+#
+# The logic here is pretty unsophisticated: for example you could 
+# imagine adding an additional check to not decrease array capacity
+# below a certain absolute level to avoid frequently resizing small
+# arrays.
+#
+# As noted in `linked_list.rb` arrays store their values in a
+# contiguous block of memory. This means that you can access
+# arbitrary points in the array in constant time by simply
+# supplying an `index`, which under the hood is used as an offset
+# from the beginning of the array's address space. Concretely this means that if
+# the VM or compiler knows both how much memory is used for each element in the
+# array and what the address of the first value is, it can find any element via
+# index by simply moving `index * num_bytes_per_element` from the start of the
+# array.
+#
+# A downside to this sequential storage approach is that adding or removing
+# elements anywhere besides the tail (end) of the array means that all of
+# the existing elements from the point of the operation on must be copied to
+# new addresses in order to keep the data in sequence. Eg, if you have 10
+# elements in an array and delete the 5th one, elements 6-10 must be copied
+# into positions 5-9. Similarly, if you have 10 elements and insert a new one
+# at position 5 (zero-based index 4) you must move elements 5-10 to positions
+# 6-11 (and you must resize the array if its current capacity is only 10).
 class ResizingArray
   CAPACITY_CHANGE_FACTOR   = 0.50
   LOWER_CAPACITY_THRESHOLD = 0.33
@@ -20,11 +57,14 @@ class ResizingArray
     @capacity.to_i
   end
 
+  # O(1), just move `index * num_byte_per_element` from the start of the array.
   def [](index)
     validate_index!(index)
     instance_variable_get("@item_#{index}")
   end
 
+  # O(1) unless the capacity of the array must be increased. No moving of
+  # existing values required.
   def push(value)
     instance_variable_set("@item_#{size}", value)
     @size += 1
@@ -36,6 +76,8 @@ class ResizingArray
     push(value)
   end
 
+  # O(1) unless the capacity of the array must be increased. No moving of
+  # existing values required.
   def pop
     return if size.zero?
     @size -= 1
@@ -58,6 +100,7 @@ class ResizingArray
     shift
   end
 
+  # O(n). Must move existing values around.
   def insert_at(index, value)
     validate_index!(index)
     increment_all_indexes_starting_at(index)
@@ -67,6 +110,7 @@ class ResizingArray
     value
   end
 
+  # O(n). Must move existing values around.
   def delete_at(index)
     validate_index!(index)
     return if size.zero?

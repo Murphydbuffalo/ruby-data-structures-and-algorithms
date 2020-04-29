@@ -3,7 +3,7 @@
 # to keep their values adjacent to one another. Instead they rely
 # on pointers from one node to the next/previous.
 #
-# This means that they have worse locality of reference arrays,
+# This means that they have worse locality of reference than arrays,
 # and therefore the underlying hardware is less able to cache
 # some contiguous block of memory with all the nodes in the list.
 #
