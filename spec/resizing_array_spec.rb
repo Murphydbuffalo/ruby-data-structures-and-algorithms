@@ -60,29 +60,15 @@ describe ResizingArray do
 
   it "raises an error if you attempt to access an index out of range" do
     array = described_class.new(1, 2, 3)
-    expect { array[4] }.to raise_error(
-      ArgumentError,
-      "index cannot be negative or greater than the current size of the array"
-    )
-    expect { array[-1] }.to raise_error(
-      ArgumentError,
-      "index cannot be negative or greater than the current size of the array"
-    )
+    expect { array[4] }.not_to raise_error
+    expect { array[10] }.not_to raise_error
 
-    expect { array.insert_at(4, "hi") }.to raise_error(
-      ArgumentError,
-      "index cannot be negative or greater than the current size of the array"
-    )
-
-    expect { array.insert_at(30, "bye") } .to raise_error(
-      ArgumentError,
-      "index cannot be negative or greater than the current size of the array"
-    )
-
-    expect { array.delete_at(4) }.to raise_error(
-      ArgumentError,
-      "index cannot be negative or greater than the current size of the array"
-    )
+    error_message = "index cannot be negative or greater than the current capacity of the array"
+    expect { array[14] }.to raise_error(ArgumentError, error_message)
+    expect { array[-1] }.to raise_error(ArgumentError, error_message)
+    expect { array.insert_at(14, "hi") }.to raise_error(ArgumentError, error_message)
+    expect { array.insert_at(30, "bye") }.to raise_error(ArgumentError, error_message)
+    expect { array.delete_at(14) }.to raise_error(ArgumentError, error_message)
   end
 
   it "has #size and #capacity" do

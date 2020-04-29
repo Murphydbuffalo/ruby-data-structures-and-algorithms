@@ -187,8 +187,8 @@ class ResizingArray
   end
 
   def validate_index!(index)
-    return if index >= 0 && index <= size
+    return if index >= 0 && index <= capacity
     raise ArgumentError,
-      "index cannot be negative or greater than the current size of the array"
+      "index cannot be negative or greater than the current capacity of the array"
   end
 end
