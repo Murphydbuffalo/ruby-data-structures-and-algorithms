@@ -145,8 +145,11 @@ describe ResizingArray do
   end
 
   describe "#each" do
+    let(:array) do
+      described_class.new("a", "b", "c")
+    end
+
     it "executes a block with each item as an argument" do
-      array = described_class.new("a", "b", "c")
       %w[a b c].each do |item|
         # Call some arbitrary method with each item to assert
         # that ResizingArray#each works
@@ -157,27 +160,45 @@ describe ResizingArray do
         String.try_convert(item)
       end
     end
+
+    it "raises an error if no block is provided" do
+      expect { array.each }.to raise_error(ArgumentError)
+    end
   end
 
   describe "#map" do
+    let(:array) do
+      described_class.new("a", "b", "c")
+    end
+
     it "returns a transformed version of itself based on a block" do
-      array = described_class.new("a", "b", "c")
       new_array = array.map { |item| item.upcase }
       expect(new_array.size).to be 3
       expect(new_array[0]).to eq("A")
       expect(new_array[1]).to eq("B")
       expect(new_array[2]).to eq("C")
     end
+
+    it "raises an error if no block is provided" do
+      expect { array.each }.to raise_error(ArgumentError)
+    end
   end
 
   describe "#select" do
+    let(:array) do
+      described_class.new(5, 10, 15, 20, 25)
+    end
+
     it "returns a filtered version of itself based on a block" do
-      array = described_class.new(5, 10, 15, 20, 25)
       new_array = array.select { |item| item > 12 }
       expect(new_array.size).to be 3
       expect(new_array[0]).to eq(15)
       expect(new_array[1]).to eq(20)
       expect(new_array[2]).to eq(25)
+    end
+
+    it "raises an error if no block is provided" do
+      expect { array.each }.to raise_error(ArgumentError)
     end
   end
 end
