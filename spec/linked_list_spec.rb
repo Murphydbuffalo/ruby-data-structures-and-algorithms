@@ -85,4 +85,30 @@ describe LinkedList do
     expect(subject.head.next_node). to eq subject.tail
     expect(subject.tail.prev_node). to eq subject.head
   end
+
+  describe "#each" do
+    it "executes a block with each item as an argument" do
+      subject.append("a")
+      subject.append("b")
+      subject.append("c")
+
+      %w[a b c].each do |item|
+        # Call some arbitrary method with each item to assert
+        # that ResizingArray#each works
+        expect(String).to receive(:try_convert).with(item)
+      end
+
+      subject.each do |item|
+        String.try_convert(item)
+      end
+    end
+
+    it "raises an error if no block is provided" do
+      subject.append("a")
+
+      expect { subject.each }.to raise_error(ArgumentError)
+    end
+  end
+
+
 end

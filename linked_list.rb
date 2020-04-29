@@ -28,6 +28,19 @@ class LinkedList
     current
   end
 
+  def each
+    raise ArgumentError, 'no block given' unless block_given?
+
+    current = head
+
+    until current.nil?
+      yield current.value
+      current = current.next_node
+    end
+
+    current
+  end
+
   # O(1). Constant time given you have a reference to the node
   # you want to insert before/after. Just need to adjust the
   # references to next and previous nodes.
