@@ -18,10 +18,10 @@ class LinkedList
 
   # O(n). In worst case we need to traverse the entire list from
   # head to tail or vice versa. No way to access items by index.
-  def find(value)
+  def find(value = nil)
     current = head
 
-    until current.nil? || current.value == value
+    until current.nil? || (block_given? ? yield(current.value) : current.value == value)
       current = current.next_node
     end
 

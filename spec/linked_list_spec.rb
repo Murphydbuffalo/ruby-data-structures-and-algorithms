@@ -38,6 +38,18 @@ describe LinkedList do
     expect(node.prev_node.value).to eq "A"
   end
 
+  it "finds items by evaluating a block" do
+    subject.append("A")
+    subject.append("Well I certainly do enjoy a good scotch!")
+    subject.append("C")
+
+    node = subject.find { |val| val.include?("good scotch") }
+    expect(node.value). to eq "Well I certainly do enjoy a good scotch!"
+    expect(node.next_node.value).to eq "C"
+    expect(node.prev_node.value).to eq "A"
+  end
+
+
   it "iterates from one item to the next in either direction" do
     subject.append(2)
     subject.append(3)
