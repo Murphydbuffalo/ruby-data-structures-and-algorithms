@@ -36,8 +36,8 @@
 # at position 5 (zero-based index 4) you must move elements 5-10 to positions
 # 6-11 (and you must resize the array if its current capacity is only 10).
 class ResizingArray
-  CAPACITY_CHANGE_FACTOR   = 0.50
-  LOWER_CAPACITY_THRESHOLD = 0.33
+  CAPACITY_CHANGE_FACTOR      = 0.50
+  DECREASE_CAPACITY_THRESHOLD = 0.33
 
   def initialize(*values)
     index = 0
@@ -62,6 +62,15 @@ class ResizingArray
     validate_index!(index)
     instance_variable_get("@item_#{index}")
   end
+
+  def first
+    self.[](0)
+  end
+
+  def last
+    self.[](size - 1)
+  end
+
 
   # O(1) unless the capacity of the array must be increased. No moving of
   # existing values required.
@@ -108,6 +117,12 @@ class ResizingArray
     @size += 1
     increase_capacity_if_needed
     value
+  end
+
+  # O(1), constant time.
+  def []=(index, value)
+    validate_index!(index)
+    instance_variable_set("@item_#{index}", value)
   end
 
   # O(n). Must move existing values around.
@@ -165,7 +180,7 @@ class ResizingArray
   end
 
   def decrease_capacity_if_needed
-    @capacity *= CAPACITY_CHANGE_FACTOR if size < (LOWER_CAPACITY_THRESHOLD * capacity)
+    @capacity *= CAPACITY_CHANGE_FACTOR if size < (DECREASE_CAPACITY_THRESHOLD * capacity)
   end
 
   def increment_all_indexes_starting_at(index)
@@ -187,8 +202,8 @@ class ResizingArray
   end
 
   def validate_index!(index)
-    return if index >= 0 && index <= capacity
+    return if index >= 0 && index <= size
     raise ArgumentError,
-      "index cannot be negative or greater than the current capacity of the array"
+      "index cannot be negative or greater than the current size of the array"
   end
 end

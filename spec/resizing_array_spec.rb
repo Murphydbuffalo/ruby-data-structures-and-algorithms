@@ -24,7 +24,7 @@ describe ResizingArray do
     expect(subject.shift).to be nil
   end
 
-  it "reads, inserts and deletes items from arbitrary indexes" do
+  it "reads, inserts, overwrites, and deletes items from arbitrary indexes" do
     subject.push("c")
     expect(subject.insert_at(0, "a")).to eq "a"
     expect(subject.insert_at(1, "b")).to eq "b"
@@ -35,7 +35,10 @@ describe ResizingArray do
     expect(subject[2]).to eq "c"
     expect(subject[3]).to eq "d"
 
-    %w[a b c d].each do |letter|
+    subject[2] = "surprise!"
+    expect(subject[2]).to eq "surprise!"
+
+    %w[a b surprise! d].each do |letter|
       expect(String).to receive(:try_convert).with(letter)
     end
 
@@ -46,10 +49,10 @@ describe ResizingArray do
     expect(subject.delete_at(1)).to eq "b"
 
     expect(subject[0]).to eq "a"
-    expect(subject[1]).to eq "c"
+    expect(subject[1]).to eq "surprise!"
     expect(subject[2]).to eq "d"
 
-    %w[a c d].each do |letter|
+    %w[a surprise! d].each do |letter|
       expect(String).to receive(:try_convert).with(letter)
     end
 
@@ -60,15 +63,14 @@ describe ResizingArray do
 
   it "raises an error if you attempt to access an index out of range" do
     array = described_class.new(1, 2, 3)
-    expect { array[4] }.not_to raise_error
-    expect { array[10] }.not_to raise_error
-
-    error_message = "index cannot be negative or greater than the current capacity of the array"
-    expect { array[14] }.to raise_error(ArgumentError, error_message)
+    error_message =
+      "index cannot be negative or greater than the current size of the array"
+    expect { array[4] }.to raise_error(ArgumentError, error_message)
     expect { array[-1] }.to raise_error(ArgumentError, error_message)
-    expect { array.insert_at(14, "hi") }.to raise_error(ArgumentError, error_message)
+    expect { array.insert_at(4, "hi") }.to raise_error(ArgumentError, error_message)
     expect { array.insert_at(30, "bye") }.to raise_error(ArgumentError, error_message)
-    expect { array.delete_at(14) }.to raise_error(ArgumentError, error_message)
+    expect { array.delete_at(4) }.to raise_error(ArgumentError, error_message)
+    expect { array[4] = "boo" }.to raise_error(ArgumentError, error_message)
   end
 
   it "has #size and #capacity" do
