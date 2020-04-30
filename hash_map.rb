@@ -71,22 +71,21 @@ class HashMap
   attr_accessor :array
   attr_reader   :num_entries
 
-  # Double the size of the underlying array, so that we have more "buckets"
+  # Replace the underlying array, so that we have more "buckets"
   # (elements in the array) to spread values out amongst. This helps to
   # preserve the constant time lookup of the hashmap, making it less likely
   # we'll have to iterate through the linked lists to find a specific key.
+  #
+  # We instantiate a new hashmap to avoid having to duplicate all of the code
+  # for inserting new entries.
   def rehash_all
-    lists     = (array.capacity * 2).times.map { LinkedList.new }
-    new_array = ResizingArray.new(*lists)
-
-    keys.map do |key| 
-      hash_code = hash(key)
-      index     = hash_code % new_array.size
-
-      new_array[index].append(ResizingArray.new(key, self.[](key)))
+    key_value_pairs = keys.map do |key| 
+      [key, self.[](key)]
     end
 
-    self.array = new_array
+    new_hash = self.class.new(key_value_pairs)
+
+    self.array = new_hash.send(:array)
 
     true
   end
