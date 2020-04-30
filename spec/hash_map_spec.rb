@@ -25,6 +25,24 @@ describe HashMap do
     expect(subject.values).to match_array(["bar", "bat", "honky tonk", "oh lord!"])
   end
 
-  it "accepts a list of key-value pairs at initialization"
-  it "rehashes all entries when the ratio of entries to buckets it too high"
+  it "accepts a list of key-value pairs at initialization" do
+    h = described_class.new([[:foo, "bar"], [:baz, "bat"]])
+    expect(h[:foo]).to eq "bar"
+    expect(h[:baz]).to eq "bat"
+  end
+
+  it "rehashes all entries when the ratio of entries to buckets it too high" do
+    subject = described_class.new
+    expect(subject).to receive(:rehash_all).and_call_original
+
+    8.times do |n|
+      subject[n.to_s] = n    
+    end
+
+    expect(subject.send(:array).capacity).to be >= 16
+
+    8.times do |n|
+      expect(subject[n.to_s]).to be n    
+    end
+  end
 end
