@@ -90,7 +90,7 @@ class HashMap
     true
   end
 
-  # Assuming our hash code function output values uniformly at random then
+  # Assuming our hash code function outputs values uniformly at random then
   # we'll rehash when there are roughly 0.75 entries per element in the array.
   def needs_rehashing?
     num_entries > (array.size * LOAD_FACTOR)
