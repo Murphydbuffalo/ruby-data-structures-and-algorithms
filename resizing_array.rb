@@ -17,15 +17,14 @@
 # below a certain absolute level to avoid frequently resizing small
 # arrays.
 #
-# As noted in `linked_list.rb` arrays store their values in a
-# contiguous block of memory. This means that you can access
-# arbitrary points in the array in constant time by simply
-# supplying an `index`, which under the hood is used as an offset
-# from the beginning of the array's address space. Concretely this means that if
-# the VM or compiler knows both how much memory is used for each element in the
-# array and what the address of the first value is, it can find any element via
-# index by simply moving `index * num_bytes_per_element` from the start of the
-# array.
+# As noted in `linked_list.rb` arrays store their values in a contiguous block
+# of memory. This means that you can access arbitrary points in the array in
+# constant time by simply supplying an `index`, which under the hood is used as
+# an offset from the beginning of the array's address space. Concretely this
+# means that if the VM or compiler knows both how much memory is used for each
+# element in the array and what the address of the first value is, it can
+# produce instructions to find any element via index by simply moving
+# `index * num_bytes_per_element` from the start of the array.
 #
 # A downside to this sequential storage approach is that adding or removing
 # elements anywhere besides the tail (end) of the array means that all of
@@ -57,10 +56,16 @@ class ResizingArray
     @capacity.to_i
   end
 
-  # O(1), just move `index * num_byte_per_element` from the start of the array.
+  # O(1) (constant time), just move `index * num_byte_per_element` from the
+  # start of the array.
   def [](index)
     validate_index!(index)
     instance_variable_get("@item_#{index}")
+  end
+
+  def []=(index, value)
+    validate_index!(index)
+    instance_variable_set("@item_#{index}", value)
   end
 
   def first
@@ -70,7 +75,6 @@ class ResizingArray
   def last
     self.[](size - 1)
   end
-
 
   # O(1) unless the capacity of the array must be increased. No moving of
   # existing values required.
@@ -85,8 +89,6 @@ class ResizingArray
     push(value)
   end
 
-  # O(1) unless the capacity of the array must be increased. No moving of
-  # existing values required.
   def pop
     return if size.zero?
     @size -= 1
@@ -94,6 +96,29 @@ class ResizingArray
     instance_variable_get("@item_#{size}").tap do
       decrease_capacity_if_needed
       remove_instance_variable("@item_#{size}")
+    end
+  end
+
+  # O(n) in the worst case because we must copy existing values over to
+  # new positions in the array..
+  def insert_at(index, value)
+    validate_index!(index)
+    increment_all_indexes_starting_at(index)
+    instance_variable_set("@item_#{index}", value)
+    @size += 1
+    increase_capacity_if_needed
+    value
+  end
+
+  def delete_at(index)
+    validate_index!(index)
+    return if size.zero?
+    @size -= 1
+
+    instance_variable_get("@item_#{index}").tap do
+      remove_instance_variable("@item_#{index}")
+      decrement_all_indexes_starting_at(index + 1)
+      decrease_capacity_if_needed
     end
   end
 
@@ -107,35 +132,6 @@ class ResizingArray
 
   def dequeue
     shift
-  end
-
-  # O(n). Must move existing values around.
-  def insert_at(index, value)
-    validate_index!(index)
-    increment_all_indexes_starting_at(index)
-    instance_variable_set("@item_#{index}", value)
-    @size += 1
-    increase_capacity_if_needed
-    value
-  end
-
-  # O(1), constant time.
-  def []=(index, value)
-    validate_index!(index)
-    instance_variable_set("@item_#{index}", value)
-  end
-
-  # O(n). Must move existing values around.
-  def delete_at(index)
-    validate_index!(index)
-    return if size.zero?
-    @size -= 1
-
-    instance_variable_get("@item_#{index}").tap do
-      remove_instance_variable("@item_#{index}")
-      decrement_all_indexes_starting_at(index + 1)
-      decrease_capacity_if_needed
-    end
   end
 
   def each

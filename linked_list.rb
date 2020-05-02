@@ -1,5 +1,5 @@
 # Unlike an array, which always stores its values sequentially in
-# a contiguous block of memory addresses linked lists do not need
+# a contiguous block of memory addresses, linked lists do not need
 # to keep their values adjacent to one another. Instead they rely
 # on pointers from one node to the next/previous.
 #
@@ -11,13 +11,15 @@
 # data you want to keep in memory is very large relative to the
 # hardware) there must be a non-fragmented (contiguous) block of
 # memory large enough to accomodate all the values of an array,
-# whereas a linked list does not require those addresses to be
-# contiguous/adjacent to one another.
+# whereas a linked list allows you to use all of the available
+# memory regardless of how fragmented it is.
 class LinkedList
   attr_reader :head, :tail
 
-  # O(n). In worst case we need to traverse the entire list from
-  # head to tail or vice versa. No way to access items by index.
+  # Runs in O(n) (linear time) because in the worst case we need to traverse
+  # the entire list from head to tail or vice versa. There is no way to access
+  # items by index as you would in an array, or by key as you would in
+  # a hashmap.
   def find(value = nil)
     current = head
 
@@ -41,9 +43,10 @@ class LinkedList
     current
   end
 
-  # O(1). Constant time given you have a reference to the node
-  # you want to insert before/after. Just need to adjust the
-  # references to next and previous nodes.
+  # All of the remaining operations defined here run in O(1) (constant time)
+  # given you have a reference to the node you want to insert before/after.
+  # The only work necessary is to adjust the references to/from the adjacent
+  # nodes.
   def insert(value, after: nil, before: nil)
     new_node = Node.new(value)
 
@@ -75,9 +78,6 @@ class LinkedList
     insert(value, after: tail)
   end
 
-  # O(1). Constant time given you have a reference to the node
-  # you want to insert before/after. Just need to adjust the
-  # references to next and previous nodes.
   def delete(node)
     return if node.nil?
 
