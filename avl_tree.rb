@@ -105,13 +105,6 @@ class AVLTree
     true
   end
 
-  def print
-    # TODO: figure out the depth or approximate depth of the tree
-    # Maybe call #each, add all nodes to an array
-    # indent root node based on how deep tree is
-    # indent subsequent layers relative to the root
-  end
-
   private
 
   class Node
