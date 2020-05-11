@@ -189,6 +189,18 @@ class AVLTree
     binary_search(node, value, &block)
   end
 
+  def depth_from(node)
+    nodes = [node].compact
+    depth = 0
+
+    until nodes.empty?
+      depth += 1
+      nodes = nodes.map { |n| [n.left, n.right] }.flatten.compact
+    end
+
+    depth
+  end
+
   def rotate(node)
     if node.right_heavy?
       child = node.right
@@ -266,8 +278,8 @@ class AVLTree
         node.right = opposite_direction_grandchild
         opposite_direction_grandchild.parent = node
 
-        node.balance = 1
-        child.balance = -1
+        node.balance = depth_from(node.right) - depth_from(node.left)
+        child.balance = depth_from(child.right) - depth_from(child.left)
       end
     elsif node.left_heavy?
       child = node.left
@@ -344,8 +356,8 @@ class AVLTree
         node.left = opposite_direction_grandchild
         opposite_direction_grandchild.parent = node
 
-        node.balance = -1
-        child.balance = 1
+        node.balance = depth_from(node.right) - depth_from(node.left)
+        child.balance = depth_from(child.right) - depth_from(child.left)
       end
     end
   end

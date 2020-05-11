@@ -212,7 +212,7 @@ describe AVLTree do
   # Confused? Watch this!
   # https://www.cs.usfca.edu/~galles/visualization/AVLtree.html
   context "rotating nodes to keep subtree heights within 1 of each other" do
-    it "rotates right-heavy subtrees to maintain balance" do
+    it "rotates left-heavy subtrees with only a left grandchild" do
       node = tree.insert(8)
       expect(node.parent.value).to be 9
       expect(node.parent.right.value).to be 33
@@ -238,29 +238,138 @@ describe AVLTree do
       #      -3     7   9
       #                / \
       #               8   33
+    end
 
+    it "rotates left-heavy subtrees with only a right grandchild" do
+      tree = described_class.new
+      tree.insert(5)
+      tree.insert(3)
+      tree.insert(4)
+      # Without rotation we'd end up with the following tree, which leaves the
+      # root, 5, with a balance of -2
+      #      5
+      #     /
+      #    3
+      #     \
+      #      4
+      # So we rotate to:
+      #      4
+      #     / \
+      #    3   5
+
+      expect(tree.root.value).to be 4
+      expect(tree.root.right.value).to be 5
+      expect(tree.root.left.value).to be 3
+    end
+
+    it "rotates left-heavy subtrees with both right and left grandchildren" do
+      tree = described_class.new
+      tree.insert(5)
+      tree.insert(3)
+      node = tree.insert(6)
+      tree.insert(4)
+      tree.insert(2)
+      tree.delete(node)
+      # Without rotation we'd end up with the following tree, which leaves the
+      # root, 5, with a balance of -2
+      #      5
+      #     /
+      #    3
+      #   / \
+      #  2   4
+      # So we rotate to:
+      #      3
+      #    /   \
+      #   2    5
+      #       /
+      #      4
+      expect(tree.root.value).to be 3
+      expect(tree.root.right.value).to be 5
+      expect(tree.root.right.left.value).to be 4
+      expect(tree.root.left.value).to be 2
+
+      values = []
+
+      tree.each do |node|
+        values << node.value
+      end
+
+      expect(values).to eq [2, 3, 4, 5]
+      expect(tree.root.balance).to be 1
+      expect(tree.root.left.balance).to be 0
+      expect(tree.root.right.balance).to be -1
+      expect(tree.root.right.left.balance).to be 0
+    end
+
+    it "rotates right-heavy subtrees with only a right grandchild" do
+      tree = described_class.new
+      tree.insert(1)
+      tree.insert(2)
+      tree.insert(3)
+      # Without rotation we'd end up with the following tree, which leaves the
+      # root, 5, with a balance of -2
+      #      1
+      #       \
+      #        2
+      #         \
+      #          3
+      # So we rotate to:
+      #      2
+      #     / \
+      #    1   3
+      expect(tree.root.value).to be 2
+      expect(tree.root.right.value).to be 3
+      expect(tree.root.left.value).to be 1
+    end
+
+    it "rotates right-heavy subtrees with only a right grandchild" do
+      tree = described_class.new
+      tree.insert(1)
+      tree.insert(2)
+      tree.insert(3)
+      # Without rotation we'd end up with the following tree, which leaves the
+      # root, 5, with a balance of -2
+      #      1
+      #       \
+      #        3
+      #      /
+      #    2
+      # So we rotate to:
+      #      2
+      #     / \
+      #    1   3
+      expect(tree.root.value).to be 2
+      expect(tree.root.right.value).to be 3
+      expect(tree.root.left.value).to be 1
+    end
+
+    it "rotates right-heavy subtrees with both left and right grandchildren" do
+      tree.insert(8)
       node = tree.insert(16)
+      # This time without rebalancing we'd end up with the right subtree of 7
+      # differing from the left by more than 1
+      #            5
+      #          /   \
+      #         1     7
+      #        /     / \
+      #      -3     7   9
+      #                / \
+      #               8   33
+      #                   /
+      #                  16
+      # So we must rotate again:
+      #             5
+      #          /    \
+      #         1      9
+      #        /     /   \
+      #      -3     7     33
+      #           /  \    /
+      #          7    8  16
       expect(node.parent.value).to be 33
       expect(node.parent.parent.value).to be 9
       expect(node.parent.parent.left.value).to be 7
       expect(node.parent.parent.left.left.value).to be 7
       expect(node.parent.parent.left.right.value).to be 8
-      # This time without rebalancing we'd end up with the right subtree of 7
-      # differing from the left by more than 1. So we must rotate again:
-      #             5
-      #          /    \
-      #         1       9
-      #        /     /    \
-      #      -3     7      33
-      #           /  \    /
-      #          7    8  16
-      # The rotation algorithm goes like this:
-      # traverse up parent-by-parent from the newly inserted node until you find
-      # one for whom the invariant is violated. Once you do, you know that the
-      # violation will be a difference in subtree height of exactly 1, because
-      # any existing violation would've been corrected by a previous rotation.
-      # If the node is right-heavy we need to "replace" it by its first child
-      # on the right side as in the diagram above and vice versa for the left side
       values = []
 
       tree.each do |node|
@@ -268,46 +377,14 @@ describe AVLTree do
       end
 
       expect(values).to eq [-3, 1, 5, 7, 7, 8, 9, 16, 33]
+      expect(tree.root.balance).to be 1
+      expect(tree.root.left.balance).to be -1
+      expect(tree.root.left.left.balance).to be 0
+      expect(tree.root.right.balance).to be 0
+      expect(tree.root.right.right.balance).to be -1
+      expect(tree.root.right.left.balance).to be 0
+      expect(tree.root.right.left.left.balance).to be 0
+      expect(tree.root.right.left.right.balance).to be 0
     end
-
-    it "rotates left-heavy subtrees to maintain balance"
-    it "makes child nodes grandchildren when a rotation leads to a new child being added to a node"
-    # Eg if 11 was just inserted;
-    #             5
-    #          /    \
-    #         0       7
-    #              /    \
-    #             6      9
-    #                      \
-    #                       11
-    # 11's grandparent 7 is actually not in violation of the invariant constraint.
-    # But, as we traverse upwards, we find that the great-grandparent 5 is in violation.
-    # So we need to rotate 7 up and make 5 the left child of 7. But 7 already
-    # has a left child, 6. So, we make 6 the right child of 5.
-    #                 7
-    #              /    \
-    #             5      9
-    #            / \       \
-    #           0   6       11
-    it "rotates after deleting a node leaves the tree unbalanced"
-    # Eg if we delete 0;
-    #             5
-    #          /    \
-    #         0       7
-    #              /    \
-    #             6      9
-    # We traverse upwards to 5 and see that it is in violation of the invariant constraint:
-    #             5
-    #               \
-    #                 7
-    #              /    \
-    #             6      9
-    # So we need to rotate 7 up and make 5 the left child of 7. But 7 already
-    # has a left child, 6. So, we make 6 the right child of 5.
-    #                 7
-    #              /    \
-    #             5      9
-    #              \       \
-    #               6       11
   end
 end
