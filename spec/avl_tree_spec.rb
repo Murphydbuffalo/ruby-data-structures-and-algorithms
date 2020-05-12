@@ -209,45 +209,6 @@ describe AVLTree do
     expect(root.right.value).to be 9
   end
 
-  # Tree rotations prevent our tree from becoming *degenerate*. That is, as nodes
-  # are inserted and deleted some sections of the tree may become much deeper
-  # than others. To see why this is a problem imagine the extreme case:
-  # a "tree" where all child nodes are the right-hand child of their parent.
-  # This is just a linked list, which takes O(n) to find any given node.
-  # Eg, a degenerate binary search tree that is essentially just a linked list:
-  # 1
-  #  \
-  #   2
-  #    \
-  #     3
-  # Rotations move nodes around such that no section ("subtree") of the tree
-  # is more than 1 layer deeper/taller than its sibling subtree. The term
-  # "rotation" makes visual sense as you typically adust the nodes so that a
-  # child one side comes up to occupy the position the parent is currently in,
-  # and the parent is moved down and over to the side opposite the one that first
-  # node came from. Eg, our degenerate tree above can be rotated so that 2 comes
-  # up to where 1 is, and 1 moves down and over to the left side:
-  #   2
-  #  / \
-  # 1   3
-  #
-  # But how do we know when to perform a rotation? First, we specify an
-  # *invariant* constraint for the system. This is just a rule that we want to
-  # never be violated. For AVL trees the invariant is that no node should have
-  # one subtree be more than 1 layer deeper/taller than its sibling subtree.
-  #
-  # Next, we keep track of a *balance* attribute on each node, and adjust the
-  # balances of relevant nodes whenever a node is inserted or deleted from the
-  # tree. When that happens we traverse up the tree from the node that was
-  # inserted/deleted adjusting the balances of each ancestor node along the way.
-  # If at any point we encounter a node whose updated balance would violate our
-  # constraint we perform the appropriate rotation for that node's subtrees.
-  #
-  # Depending on the shape of the subtree the rotations look a little different.
-  # These specs demonstrate how rotations work for different shapes of subtrees.
-  #
-  # Confused? Watch this!
-  # https://www.cs.usfca.edu/~galles/visualization/AVLtree.html
   context "rotating nodes to keep subtree heights within 1 of each other" do
     it "rotates left-heavy subtrees with only a left grandchild" do
       node = tree.insert(8)

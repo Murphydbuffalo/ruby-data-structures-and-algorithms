@@ -1,39 +1,3 @@
-# The idea with this class is to show in Ruby how you might implement a
-# dynamically resizing array, without leveraging the `Array` class from
-# the standard library.
-#
-# We use the methods `instance_variable_get`, `instance_variable_set`
-# and `remove_instance_variable` to simulate allocating, deallocating,
-# and reading/writing to addresses in memory, as you would do in a
-# language like C if you wanted to implement this data structure.
-#
-# The array is initialized with some amount of `capacity` used to
-# store its values, and that capacity is expanded as needed when
-# values are added to the array. Capacity is reduced if there is
-# a lot of unused space after an item is removed from the array.
-#
-# The logic here is pretty unsophisticated: for example you could
-# imagine adding an additional check to not decrease array capacity
-# below a certain absolute level to avoid frequently resizing small
-# arrays.
-#
-# As noted in `linked_list.rb` arrays store their values in a contiguous block
-# of memory. This means that you can access arbitrary points in the array in
-# constant time by simply supplying an `index`, which under the hood is used as
-# an offset from the beginning of the array's address space. Concretely this
-# means that if the VM or compiler knows both how much memory is used for each
-# element in the array and what the address of the first value is, it can
-# produce instructions to find any element via index by simply moving
-# `index * num_bytes_per_element` from the start of the array.
-#
-# A downside to this sequential storage approach is that adding or removing
-# elements anywhere besides the tail (end) of the array means that all of
-# the existing elements from the point of the operation on must be copied to
-# new addresses in order to keep the data in sequence. Eg, if you have 10
-# elements in an array and delete the 5th one, elements 6-10 must be copied
-# into positions 5-9. Similarly, if you have 10 elements and insert a new one
-# at position 5 (zero-based index 4) you must move elements 5-10 to positions
-# 6-11 (and you must resize the array if its current capacity is only 10).
 class ResizingArray
   CAPACITY_CHANGE_FACTOR      = 0.50
   DECREASE_CAPACITY_THRESHOLD = 0.33
@@ -56,8 +20,6 @@ class ResizingArray
     @capacity.to_i
   end
 
-  # O(1) (constant time), just move `index * num_byte_per_element` from the
-  # start of the array.
   def [](index)
     validate_index!(index)
     instance_variable_get("@item_#{index}")
@@ -76,8 +38,6 @@ class ResizingArray
     self.[](size - 1)
   end
 
-  # O(1) unless the capacity of the array must be increased. No moving of
-  # existing values required.
   def push(value)
     instance_variable_set("@item_#{size}", value)
     @size += 1
@@ -99,8 +59,6 @@ class ResizingArray
     end
   end
 
-  # O(n) in the worst case because we must copy existing values over to
-  # new positions in the array.
   def insert_at(index, value)
     validate_index!(index)
     increment_all_indexes_starting_at(index)
@@ -122,30 +80,6 @@ class ResizingArray
     end
   end
 
-  # As written, operations on the head/front of the array (shift and unshift)
-  # operate in O(n) time because they are treated identically to operations
-  # at the middle of the array. However these operations can be made to run in
-  # constant time just like they are at the tail/end of the array.
-  # To do this, when the array is initialized a pointer is kept to both the
-  # first and last elements in the array (these point to the same address
-  # initially), and memory is allocated such that there is address space to
-  # either side of those pointers for values to be inserted into.
-  # As the array runs out of space on either end we must be able resize it by
-  # allocating memory on the appropriate side, expanding the array either
-  # towards the right or the left depending on where the value was inserted.
-  #
-  # This variation of the array data structure is one way of implementing a
-  # Deque, or double-ended queue. It can cause there to be more frequent
-  # resizings (eg you could do one towards the right side, then on the very next
-  # insert have to do one towards the left side) and unused space (because some
-  # empty space will tend to be kept both to the left and right ends).
-  #
-  # So there are drawbacks, but if you need to be able to perform operations on
-  # either end of the array efficiently, such as with a queue where new values
-  # are pushed onto the right side and values are shifted off the left side,
-  # then it is a good thing to do.
-  #
-  # Ruby's Array class does allow for efficient operations on either end.
   def unshift(value)
     insert_at(0, value)
   end

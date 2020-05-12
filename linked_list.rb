@@ -1,25 +1,6 @@
-# Unlike an array, which always stores its values sequentially in
-# a contiguous block of memory addresses, linked lists do not need
-# to keep their values adjacent to one another. Instead they rely
-# on pointers from one node to the next/previous.
-#
-# This means that they have worse locality of reference than arrays,
-# and therefore the underlying hardware is less able to cache
-# some contiguous block of memory with all the nodes in the list.
-#
-# One tradeoff there is that in a memory-constrainted domain (the
-# data you want to keep in memory is very large relative to the
-# hardware) there must be a non-fragmented (contiguous) block of
-# memory large enough to accomodate all the values of an array,
-# whereas a linked list allows you to use all of the available
-# memory regardless of how fragmented it is.
 class LinkedList
   attr_reader :head, :tail
 
-  # Runs in O(n) (linear time) because in the worst case we need to traverse
-  # the entire list from head to tail or vice versa. There is no way to access
-  # items by index as you would in an array, or by key as you would in
-  # a hashmap.
   def find(value = nil)
     current = head
 
@@ -43,10 +24,6 @@ class LinkedList
     current
   end
 
-  # All of the remaining operations defined here run in O(1) (constant time)
-  # given you have a reference to the node you want to insert before/after.
-  # The only work necessary is to adjust the references to/from the adjacent
-  # nodes.
   def insert(value, after: nil, before: nil)
     new_node = Node.new(value)
 
@@ -106,4 +83,3 @@ class LinkedList
     attr_accessor :value, :next_node, :prev_node
   end
 end
-
