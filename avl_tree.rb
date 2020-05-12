@@ -22,7 +22,6 @@ class AVLTree
     end
 
     new_node.parent = parent
-    child           = new_node
 
     if value <= parent.value
       parent.left = new_node
@@ -30,20 +29,7 @@ class AVLTree
       parent.right = new_node
     end
 
-    until parent.nil? do
-      balance_adjustment = child == parent.left ? -1 : 1
-      parent.balance += balance_adjustment
-
-      if parent.violating_balance_invariant?
-        rotate(parent)
-        break
-      end
-
-      break if parent.balanced?
-
-      child = parent
-      parent = parent.parent
-    end
+    adjust_balances(parent, new_node, operation: :insert)
 
     new_node
   end
@@ -52,7 +38,7 @@ class AVLTree
     return if node.nil?
 
     parent = node.parent
-    is_left_child = parent.left == node unless parent.nil?
+    was_left_child = parent.left == node unless parent.nil?
 
     if node.children.none?
       if node.root?
@@ -84,23 +70,7 @@ class AVLTree
       end
     end
 
-    # TODO: DRY this out with the logic in `insert`. Just need an argument to
-    # flip the sign of the balance adjustment.
-    until parent.nil? do
-      (is_left_child = parent.left == node) if is_left_child.nil?
-
-      balance_adjustment = is_left_child ? 1 : -1
-      parent.balance += balance_adjustment
-
-      if parent.violating_balance_invariant?
-        rotate(parent)
-        break
-      end
-
-      is_left_child = nil
-      node = parent
-      parent = parent.parent
-    end
+    adjust_balances(parent, node, operation: :delete, was_left_child: was_left_child)
 
     true
   end
@@ -333,5 +303,21 @@ class AVLTree
     end
 
     child.parent = parent
+  end
+
+  def adjust_balances(parent, node, operation:, was_left_child: false)
+    raise ArgumentError, "operation must be :insert or :delete" unless %i[insert delete].include?(operation)
+    return if parent.nil?
+
+    adjust_left = was_left_child || parent.left == node
+
+    balance_adjustment = adjust_left ? -1 : 1
+    balance_adjustment *= -1 if operation == :delete
+    parent.balance += balance_adjustment
+
+    return rotate(parent) if parent.violating_balance_invariant?
+    return if parent.balanced? && operation == :insert
+
+    adjust_balances(parent.parent, parent, operation: operation)
   end
 end
