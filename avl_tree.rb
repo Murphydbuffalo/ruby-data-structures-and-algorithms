@@ -89,18 +89,14 @@ class AVLTree
       [left, right].compact
     end
 
-    # TODO: take notes. Why is it the case that right.left always produces the
-    # in-order successor? And why does left.right always produce the in-order
-    # predecessor?
-    # Why does swapping their value with the node to be deleted's make sense?
-    # Finally, why is recursion nice for cleaning up the IOS/IOP after doing
-    # this?
-    def in_order_successor
-      right.left
+    def in_order_successor(node = right)
+      return node if node.left.nil?
+      in_order_successor(node.left)
     end
 
-    def in_order_predecessor
-      left.right
+    def in_order_predecessor(node = left)
+      return node if node.right.nil?
+      in_order_predecessor(node.right)
     end
 
     def root?
