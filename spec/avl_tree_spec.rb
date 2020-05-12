@@ -216,6 +216,18 @@ describe AVLTree do
       node = tree.insert(8)
       expect(node.parent.value).to be 9
       expect(node.parent.right.value).to be 33
+
+      root = tree.root
+      left = root.left
+      right = root.right
+      expect(root.balance).to be 1
+      expect(left.balance).to be -1
+      expect(right.balance).to be 1
+
+      tree.each do |node|
+        expect(node.balance).to be 0 unless [root, left, right].include?(node)
+      end
+
       # Without rebalancing we'd end up with a parent of 9 for the new node:
       #            5
       #          /   \
@@ -227,9 +239,7 @@ describe AVLTree do
       #             /
       #            8
       # Which violates our specified invariant that the height of the subtrees
-      # for a given node (33 in this case, because it is the nearest ancestor
-      # of the new node for whom the invariant is violated) cannot differ by
-      # more than 1.
+      # for a given node (33 in this case) cannot differ by more than 1.
       # So we rebalance the right subtree such that it looks like:
       #            5
       #          /   \
@@ -246,7 +256,7 @@ describe AVLTree do
       tree.insert(3)
       tree.insert(4)
       # Without rotation we'd end up with the following tree, which leaves the
-      # root, 5, with a balance of -2
+      # root, 5, with a balance of -2.
       #      5
       #     /
       #    3
@@ -260,6 +270,10 @@ describe AVLTree do
       expect(tree.root.value).to be 4
       expect(tree.root.right.value).to be 5
       expect(tree.root.left.value).to be 3
+
+      tree.each do |node|
+        expect(node.balance).to be 0
+      end
     end
 
     it "rotates left-heavy subtrees with both right and left grandchildren" do
@@ -320,6 +334,10 @@ describe AVLTree do
       expect(tree.root.value).to be 2
       expect(tree.root.right.value).to be 3
       expect(tree.root.left.value).to be 1
+
+      tree.each do |node|
+        expect(node.balance).to be 0
+      end
     end
 
     it "rotates right-heavy subtrees with only a right grandchild" do
@@ -341,6 +359,10 @@ describe AVLTree do
       expect(tree.root.value).to be 2
       expect(tree.root.right.value).to be 3
       expect(tree.root.left.value).to be 1
+
+      tree.each do |node|
+        expect(node.balance).to be 0
+      end
     end
 
     it "rotates right-heavy subtrees with both left and right grandchildren" do

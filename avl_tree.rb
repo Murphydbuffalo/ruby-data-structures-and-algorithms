@@ -207,7 +207,6 @@ class AVLTree
         #     (2)
         #        \
         #         (3)
-
         # Post-rotation
         #      (2)
         #    /    \
@@ -216,9 +215,7 @@ class AVLTree
         child.left = node
         node.parent = child
         node.right = nil
-
-        node.balance = 0
-        child.balance = 0
+        node.balance = child.balance = 0
       elsif same_direction_grandchild.nil? && opposite_direction_grandchild
         # Pre-rotation
         # (1)
@@ -226,31 +223,16 @@ class AVLTree
         #     (3)
         #    /
         # (2)
-
-        # Intermediate step to make it so a second rotation can balance the tree
-        # (1)
-        #   \
-        #    (2)
-        #      \
-        #      (3)
-        # TODO: can we eliminate some of these steps?
-        swap_parents_of_node_and_child(child, opposite_direction_grandchild)
-        opposite_direction_grandchild.right = child
-        child.parent = opposite_direction_grandchild
-        child.left = nil
-        node.right = opposite_direction_grandchild
-
         # Post-rotation
         #      (2)
         #    /    \
         # (1)      (3)
         swap_parents_of_node_and_child(node, opposite_direction_grandchild)
+        opposite_direction_grandchild.right = child
         opposite_direction_grandchild.left = node
-        node.parent = opposite_direction_grandchild
-        node.right = nil
-
-        node.balance = 0
-        child.balance = 0
+        child.parent = node.parent = opposite_direction_grandchild
+        node.right = child.left = nil
+        node.balance = child.balance = 0
       elsif same_direction_grandchild && opposite_direction_grandchild
         # Pre-rotation
         # (1)
@@ -295,9 +277,7 @@ class AVLTree
         child.right = node
         node.parent = child
         node.left = nil
-
-        node.balance = 0
-        child.balance = 0
+        node.balance = child.balance = 0
       elsif same_direction_grandchild.nil? && opposite_direction_grandchild
         # Pre-rotation
         #         (3)
@@ -305,30 +285,16 @@ class AVLTree
         #     (1)
         #        \
         #         (2)
-
-        # Intermediate step to make it so a second rotation can balance the tree
-        #         (3)
-        #        /
-        #     (2)
-        #    /
-        # (1)
-        swap_parents_of_node_and_child(child, opposite_direction_grandchild)
-        opposite_direction_grandchild.left = child
-        child.right = nil
-        child.parent = opposite_direction_grandchild
-        node.left = opposite_direction_grandchild
-
         # Post-rotation
         #      (2)
         #    /    \
         # (1)      (3)
         swap_parents_of_node_and_child(node, opposite_direction_grandchild)
+        opposite_direction_grandchild.left = child
         opposite_direction_grandchild.right = node
-        node.parent = opposite_direction_grandchild
-        node.left = nil
-
-        node.balance = 0
-        child.balance = 0
+        child.parent = node.parent = opposite_direction_grandchild
+        child.right = node.left = nil
+        node.balance = child.balance = 0
       elsif same_direction_grandchild && opposite_direction_grandchild
         # Pre-rotation
         #            (5)
