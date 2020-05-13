@@ -5,7 +5,7 @@ If you're like me and come from a non-Computer-Science background and have been 
 
 We'll cover why you might want to use a given data structure and will give examples of places you've probably encountered them in your day-to-day as a programmer, perhaps without you even knowing it.
 
-You'll also learn about the performance characteristics of each data structure, and how those characteristics can very greatly from the average case to the worst case.
+You'll also learn about the performance characteristics of each data structure, and how those characteristics can vary greatly from the average case to the worst case.
 
 We'll see how you can use different data structures to implement things like stacks, queues, and deques.
 
@@ -28,6 +28,8 @@ bundle exec rspec spec
 + [Self-balancing binary search trees](#binary-search-trees)
 
 ## Dynamic arrays
+You can find the code for dynamically resizing arrays in `resizing_array.rb` and the corresponding spec file.
+
 The `Array` class you're familiar with from Ruby's standard library is an
 implementation of a _dynamic_ or _automatically resizing_ array. If you think
 about how an array behaves [in a lower-level language like C](https://www.tutorialspoint.com/cprogramming/c_arrays.htm#declaring-arrays) this terminology will begin to make sense.
@@ -41,9 +43,9 @@ If you are removing elements from the array you'll probably want to de-allocate
 ("free") some of that memory so that your program isn't needlessly hogging your
 computer's resources.
 
-The idea with this class is to show in Ruby how you might implement a
-dynamically resizing array, without leveraging the `Array` class from
-the standard library.
+The idea with our `ResizingArray` class is to show in Ruby how you might implement
+a dynamically resizing array, without leveraging the `Array` class from the
+standard library.
 
 We use the methods `instance_variable_get`, `instance_variable_set`
 and `remove_instance_variable` to simulate allocating, de-allocating,
@@ -81,7 +83,7 @@ at position 5 (zero-based index 4) you must move elements 5-10 to positions
 Finally, storing items at sequential addresses in memory provides good [locality
 of reference](https://en.wikipedia.org/wiki/Locality_of_reference), meaning that
 the computer can relatively easily store and re-use values from the array in its
-CPU caches. More concretely, when a compute reads from memory, it typically grabs
+CPU caches. More concretely, when a computer reads from memory, it typically grabs
 as much data as it can process at once, rather than only grabbing the data at
 the specific memory address requested.
 
@@ -111,7 +113,7 @@ to the value you're searching for.
 
 + Insert/delete and at end ("tail") of the array: O(1) to O(n) - In the average case this runs in constant time because
 you're just writing or removing the value at the last address in memory (which
-is easy to find, just move `array_size * num_bytes_per_element` from the start
+is easy to find, just move `(array_size - 1) * num_bytes_per_element` from the start
 address of the array). _However_, as noted above, there are cases where this will
 be much slower. If the array is already full when we try to insert an item, or
 if the array has too much empty space when we delete an item a resizing will occur.
@@ -143,7 +145,7 @@ and queues (first in, first out).
 
 Making your array behave like a deque can cause there to be more frequent
 resizings (eg you could do one towards the right side, then on the very next
-insert have to do one towards the left side) and unused space (because some
+insert have to do one towards the left side) and more unused space (because some
 empty space will tend to be kept both to the left and right ends).
 
 So there are drawbacks, but if you need to be able to perform operations on
@@ -178,6 +180,8 @@ puts stack_perf
 ```
 
 ## Linked lists
+You can find the code for linked lists in `linked_list.rb` and the corresponding spec file.
+
 Unlike an array, which always stores its values sequentially in
 a contiguous block of memory addresses, linked lists do not need
 to keep their values adjacent to one another. Instead they rely
@@ -203,6 +207,8 @@ want to insert or delete_ these operations run in constant time because the only
 work necessary is to adjust the references to/from the adjacent nodes.
 
 ## Hash maps
+You can find the code for hash maps in `hash_map.rb` and the corresponding spec file.
+
 Hash maps (AKA hash tables or just "hashes" in Ruby) can read, write, and
 delete entries in O(1) (constant time) in the average case. However, in
 the worst case these operations occur in O(n) (linear time) because of the
@@ -217,7 +223,7 @@ Hash functions take in some arbitrary data and output an integer value known
 as a "hash", "hash digest", or "hash code" that has several useful properties:
 1. It is always of the same number of digits
 2. Its input value cannot be deduced from its output value.
-3. It is uniformly random, meaning if the possible range of values for you
+3. It is uniformly random, meaning if the possible range of values for your
    hash function is 1-100, each of those numbers is equally likely to be
    produced. You won't get way more 50s than you will 2s.
 4. It is always the same for a given input, meaning the hash function is
@@ -243,8 +249,7 @@ for another day. Google it, jeeze.
 
 OK, back to hash maps. Hash maps take advantage of the fact that reading,
 writing, or deleting the element at a given index in an array can happen
-in constant time. Read the comments in the `ResizingArray` class for more
-information on why that is.
+in constant time.
 
 The obvious limitation to this feature of arrays is that in order to take
 advantage of those constant time operations you must know the index of the
@@ -265,11 +270,12 @@ we can look up this array index in the same way when it's time to read
 a value from the hash map by its key.
 
 But what about the hash collisions mentioned above? It is possible to produce
-the same digest for multiple given inputs. To resolve such collisions We turn
-to the linked list. At each index in the array, rather than directory storing
+the same digest for multiple given inputs. To resolve such collisions we turn
+to the linked list. At each index in the array, rather than directly storing
 the value we want to write to the hash map, we store a linked list. Each node
 in the linked list contains both the key and the value. If there is
-a collision while writing to the hash map, we simply append another node to the list.
+a collision while writing to the hash map, we simply append another node to the
+list with the new key-value pair.
 When reading a value from the hash map we iterate through the linked list at
 the appropriate array index until we find the key we are interested in.
 
@@ -301,18 +307,17 @@ many thousands or millions of entries in memory and you cannot afford to have
 any operations take linear time, then a hash map may *not* be the best choice.
 
 Further, hash maps don't keep an kind of order to their entries. So you'll need
-to do your own sorting if that's important to your application. This is more
+to do your own sorting if that's crucial to your application. This is more
 important than it might seem at first glance.
 
-Consider that most database indexes are binary search trees under the hood
+Consider that most database indexes are binary search trees (BSTs) under the hood,
 not hash maps. For example both [PostgreSQL](https://www.postgresql.org/docs/9.5/indexes-types.html)
 and [MongoDB](https://docs.mongodb.com/manual/indexes/#id2) use BSTs as their
 default index data structure.
 
-Why? Presumably those systems can perform rehashing in a background thread,
-thus avoiding prohibitively slow operations. But if you want to query the database using any kind of comparison
-operation other than equality (AKA SELECT name FROM people WHERE name = "fred")
-a hash map will perform in linear time and therefore be useless as an index.
+Why? If you want to query the database using any kind of comparison operation
+other than equality (AKA `SELECT name FROM people WHERE name = "fred"`) a hash
+map will perform the search in linear time and therefore be useless as an index.
 The hash map knows how to look up the value associated with the key "fred", but it
 doesn't have an efficient way to compare the values of multiple keys with the value
 "fred". Read the section below on binary search trees to learn more about the
@@ -322,22 +327,26 @@ Finally, hashes also have poor locality of reference because, like linked lists
 they don't store values sequentially in memory.
 
 ## Binary search trees
+You can find the code for hash maps in `avl_tree.rb` and the corresponding spec file.
+AVL trees are a type of binary search tree that is _self-balancing_.
+
 Self-balancing binary search trees perform reads, writes, and deletes in
-O(log n) in the average case *and* in the worst case. So if avoiding slow
-operations in imperative you may want a tree, despite its slower average
-operation time.
+O(log n) _in the worst case_. So if avoiding slow operations is imperative to
+your application then  you may want a tree rather than a hash map, despite the
+tree's slower average operation time.
 
 Further, trees order nodes as they are inserted, so you easily can traverse
-the entire tree in sorted order in log n time.
+the entire tree in sorted order in log(n) time.
 
 But wait, what's a binary search tree, and why does it need to be self-balancing?
 Whatever that means.
 
+### Binary search
 You may already be familiar with the binary search algorithm. It's simple but
 powerful. If you have some set of data in sorted order you can use binary search
 for a given value in log(n) time. To put that in perspective log base 2 of 1,000,000
-is roughly 20. So that's 20 operations to find a particular value in a data set
-of one million entries. Noice!
+is roughly 20. So that's _at most_ 20 operations to find a particular value in a
+data set of one million entries. Noice!
 
 Binary search starts at the middle value (the halfway point of the sorted data)
 and compares the value it finds there to the one it's looking for. If it doesn't
@@ -347,8 +356,7 @@ for then the search is repeated to the left of the middle value, otherwise it is
 repeated on the data to the right (assuming the data was sorted in ascending order).
 
 You repeat this process as many times as necessary, effectively ignoring half
-of the remaining data on each iteration. Thus, you can find one value out one
-million in at worst 20 iterations.
+of the remaining data on each iteration.
 
 So what's the problem with just using a sorted array and doing binary search
 when you want to find something? The problem is that, as discussed above, when
@@ -356,10 +364,11 @@ you want to insert or delete an element from the array it can be very slow
 depending on how full the array is and at what position in the array you're
 operating.
 
+### Trees
 Binary search trees solve this by organizing data in nodes that link to up to
 two child nodes. Every node has a value. If a node is a left-hand child of a given
-parent node, its value is less than its parents. If a node is right-hand child
-of a parent node then its value is greater than than that of its parent.
+parent node, its value is less than its parent's. If a node is right-hand child
+of a parent node then its value is greater than than that of its parent's.
 
 With trees a picture is worth a thousand words:
 ```ruby
@@ -396,7 +405,8 @@ Thus, all operations occur in roughly log(n) time.
 ### Rebalancing via tree rotations
 Tree rotations are a mechanism for our tree to self-balance, which prevents our
 tree from becoming *degenerate*. That is, as nodes are inserted and deleted
-some sections of the tree may become much deeper than others.
+some sections ("subtrees") of the tree may become much deeper than others.
+
 To see why this is a problem imagine the extreme case:
 a "tree" where all child nodes are the right-hand child of their parent.
 This is just a linked list, which takes O(n) to find any given node.
@@ -408,13 +418,13 @@ Eg, a degenerate binary search tree that is essentially just a linked list:
    \
     3
 ```
-Rotations move nodes around such that no section ("subtree") of the tree
-is more than 1 layer deeper/taller than its sibling subtree. The term
-"rotation" makes visual sense as you typically adust the nodes so that a
-child from one side comes up to occupy the position the parent is currently in,
-and the parent is moved down and over to the side opposite the one that first
-node came from. Eg, our degenerate tree above can be rotated so that 2 comes
-up to where 1 is, and 1 moves down and over to the left side:
+Rotations move nodes around such that no subtree is more than one layer deeper/
+taller than its sibling subtree. The term "rotation" makes visual sense as you
+typically adjust the nodes so that a child from one side comes up to occupy the
+position the parent is currently in, and the parent is moved down and over to
+the side opposite the one that first node came from. Eg, our degenerate tree
+above can be rotated so that 2 comes up to where 1 is, and 1 moves down and over
+to the left side:
 ```
   2
  / \
