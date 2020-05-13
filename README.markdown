@@ -327,7 +327,7 @@ Finally, hashes also have poor locality of reference because, like linked lists
 they don't store values sequentially in memory.
 
 ## Binary search trees
-You can find the code for hash maps in `avl_tree.rb` and the corresponding spec file.
+You can find the code for binary search trees in `avl_tree.rb` and the corresponding spec file.
 AVL trees are a type of binary search tree that is _self-balancing_.
 
 Self-balancing binary search trees perform reads, writes, and deletes in
