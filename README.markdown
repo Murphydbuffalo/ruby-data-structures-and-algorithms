@@ -212,16 +212,17 @@ You can find the code for hash maps in `hash_map.rb` and the corresponding spec 
 Hash maps (AKA hash tables or just "hashes" in Ruby) can read, write, and
 delete entries in O(1) (constant time) in the average case. However, in
 the worst case these operations occur in O(n) (linear time) because of the
-need for rehashing. What rehashing is an why it's necessary becomes apparent
+need for rehashing. What rehashing is and why it's necessary become apparent
 once you understand how hash maps work under the hood.
 
 In this implementation we will create a hash map by using the linked list and
 dynamically resizing array data structures we've already built, along with a
 crucial third piece: a hash function.
 
+### Hash functions
 Hash functions take in some arbitrary data and output an integer value known
 as a "hash", "hash digest", or "hash code" that has several useful properties:
-1. It is always of the same number of digits
+1. It is always of the same number of digits.
 2. Its input value cannot be deduced from its output value.
 3. It is uniformly random, meaning if the possible range of values for your
    hash function is 1-100, each of those numbers is equally likely to be
@@ -247,6 +248,7 @@ bits you want to encrypt using a secret, pseudo-random sequence of bits (this is
 the secret key in symmetric cryptography algorithms). But that's another topic
 for another day. Google it, jeeze.
 
+### Leveraging array access
 OK, back to hash maps. Hash maps take advantage of the fact that reading,
 writing, or deleting the element at a given index in an array can happen
 in constant time.
@@ -256,7 +258,9 @@ advantage of those constant time operations you must know the index of the
 element you'd like to access.
 
 So, hash maps use hash functions to provide a way of deducing the desired
-array index given a "key" that identifies the value at that index.
+array index given a "key" that identifies the value at that index. This is why
+hash maps are also known as _associative arrays_. They associate a key with an
+array index.
 
 Hash maps take the key and run it through their hash function, producing a
 uniformly random integer hash digest for that key. They then use the modulus
@@ -269,6 +273,7 @@ Because a hash function always outputs the same digest given the same input
 we can look up this array index in the same way when it's time to read
 a value from the hash map by its key.
 
+### Resolving collisions
 But what about the hash collisions mentioned above? It is possible to produce
 the same digest for multiple given inputs. To resolve such collisions we turn
 to the linked list. At each index in the array, rather than directly storing
@@ -279,6 +284,7 @@ list with the new key-value pair.
 When reading a value from the hash map we iterate through the linked list at
 the appropriate array index until we find the key we are interested in.
 
+### Rehashing
 You may be asking yourself: "if we have to iterate through a list, how do
 hash maps have constant time lookups?". The answer is that we ensure there is
 never a linked list with a large number of nodes to be iterated through.
@@ -298,6 +304,7 @@ because the size of the array is now different, and so the denominator in our
 Congratulations! Now you too can implement your own very, very terrible
 hash map!
 
+### Performance characteristics
 Now that we understand how they work, we are in a position to understand some
 of the drawbacks to hash maps. Their guarantee of constant time operations in
 the average case is very groovy indeed. But we know that because of the need
