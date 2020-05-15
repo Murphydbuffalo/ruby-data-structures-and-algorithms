@@ -75,6 +75,12 @@ class AVLTree
     true
   end
 
+  def values
+    [].tap do |arr|
+      each { |node| arr << node.value }
+    end
+  end
+
   private
 
   class Node
