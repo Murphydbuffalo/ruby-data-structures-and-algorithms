@@ -62,6 +62,7 @@ imagine adding an additional check to not decrease array capacity
 below a certain absolute level to avoid frequently resizing small
 arrays.
 
+### Sequential storage
 Arrays store their values in a contiguous block of memory.
 This means that you can access arbitrary points in the array in
 constant time by simply supplying an `index`, which under the hood is used as
@@ -80,6 +81,7 @@ into positions 5-9. Similarly, if you have 10 elements and insert a new one
 at position 5 (zero-based index 4) you must move elements 5-10 to positions
 6-11 (and you must resize the array if its current capacity is only 10).
 
+### Locality of reference
 Finally, storing items at sequential addresses in memory provides good [locality
 of reference](https://en.wikipedia.org/wiki/Locality_of_reference), meaning that
 the computer can relatively easily store and re-use values from the array in its
@@ -102,6 +104,7 @@ that value multiple times, and also will be likely to access data at `a[1]` and
 `a[2]`. So one nice thing about arrays is that they make it easy for computer
 hardware to optimize for those cases. Hooray!
 
+### Performance characteristics
 + Find/overwrite at index: O(1) - This runs in constant time, just move
 `index * num_byte_per_element` from the start of the array and read or write the
 value in question. In Ruby everything is an object and objects take up at most
