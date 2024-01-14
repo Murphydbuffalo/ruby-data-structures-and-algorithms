@@ -13,8 +13,6 @@ But perhaps most importantly, these implementations are bare bones (_for the lov
 
 Each data structure is described in detail below and comes with a set of tests that describe what's going on in plain English.
 
-I hope you learn and enjoy! Any feedback positive or negative would be most welcome and can take the form of a GitHub issue, pull request, or email to hello@danmurphy.codes.
-
 To test things outs, pull down the repo and run:
 ```ruby
 bundle
