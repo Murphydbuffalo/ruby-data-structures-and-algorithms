@@ -9,7 +9,7 @@ You'll also learn about the performance characteristics of each data structure, 
 
 We'll see how you can use different data structures to implement things like stacks, queues, and deques.
 
-But perhaps most importantly, these implementations are bare bones (_for the love of God don't try to use them in production apps!_) and are written in Ruby in the hopes of making them easy to understand and play around with. Make a PR for improving our hash function or allowing our arrays to efficiently add and remove items from the front!
+But perhaps most importantly, these implementations are bare bones (_for the love of God don't try to use them in production apps!_) and are written in Ruby in the hopes of making them easy to understand and play around with.
 
 Each data structure is described in detail below and comes with a set of tests that describe what's going on in plain English.
 
@@ -247,7 +247,7 @@ bits.
 You can even encrypt data using a _cryptographic hash function_ that XORs the
 bits you want to encrypt using a secret, pseudo-random sequence of bits (this is
 the secret key in symmetric cryptography algorithms). But that's another topic
-for another day. Google it, jeeze.
+for another day.
 
 ### Leveraging array access
 OK, back to hash maps. Hash maps take advantage of the fact that reading,
@@ -275,9 +275,10 @@ we can look up this array index in the same way when it's time to read
 a value from the hash map by its key.
 
 ### Resolving collisions
-But what about the hash collisions mentioned above? It is possible to produce
-the same digest for multiple given inputs. To resolve such collisions we turn
-to the linked list. At each index in the array, rather than directly storing
+But what about the hash collisions mentioned above? Because we use the modulus operator,
+it is possible to produce the same index for multiple given inputs.
+To resolve such collisions we turn to the linked list.
+At each index in the array, rather than directly storing
 the value we want to write to the hash map, we store a linked list. Each node
 in the linked list contains both the key and the value. If there is
 a collision while writing to the hash map, we simply append another node to the
@@ -301,9 +302,6 @@ much iteration to find the key-value pair we are interested in.
 Rehashing involves recalculating the hash and array index for every key,
 because the size of the array is now different, and so the denominator in our
 `hash_digest % array_size` function is also different.
-
-Congratulations! Now you too can implement your own very, very terrible
-hash map!
 
 ### Performance characteristics
 Now that we understand how they work, we are in a position to understand some
@@ -345,9 +343,6 @@ tree's slower average operation time.
 
 Further, trees order nodes as they are inserted, so you easily can traverse
 the entire tree in sorted order in log(n) time.
-
-But wait, what's a binary search tree, and why does it need to be self-balancing?
-Whatever that means.
 
 ### Binary search
 You may already be familiar with the binary search algorithm. It's simple but
