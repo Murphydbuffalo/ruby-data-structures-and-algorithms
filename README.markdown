@@ -1,5 +1,5 @@
 # Data structures built with Ruby
-![A silly GIF of Jon Mulaney and Nick Kroll saying "ohhhh hello"](https://blog.chron.com/tubular/files/2014/05/oh-hello.gif)
+![A silly GIF of Jon Mulaney and Nick Kroll saying "ohhhh hello"](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExejZ0bnFlcXJkZ2NvbXltdzJzN3YzMXk1eW8wYmoxcHk5eDUxZ2xudSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4JY19LAUvQFNBRjgcC/giphy.gif)
 
 If you're like me and come from a non-Computer-Science background, you may be curious about how data structures such as linked lists, hash maps, binary search trees and arrays work and what the trade-offs between them are, then this is the place for you.
 
